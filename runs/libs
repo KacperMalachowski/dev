@@ -16,14 +16,14 @@ if [[ "${OS}" == "macos" ]]; then
         echo "Homebrew is not installed. Please install Homebrew first."
         exit 1
     fi
-    brew install git ripgrep xclip jq tldr python3 deno
+    brew install git ripgrep xclip jq tldr python3
 else
     if ! command -v apt &> /dev/null; then
         echo "apt is not available. This script is intended for Debian-based systems."
         exit 1
     fi
     sudo apt -y update
-    sudo apt -y install git ripgrep xclip jq tldr python3-pip deno
+    sudo apt -y install git ripgrep xclip jq tldr python3-pip
 fi
 
 git clone git@github.com:junegunn/fzf.git $HOME/personal/fzf
