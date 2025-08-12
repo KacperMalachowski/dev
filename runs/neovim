@@ -30,40 +30,39 @@ fi
 curl -L "${URL}" -o nvim.tar.gz
 
 if [[ "$OS" == "macos" ]]; then
-    xattr -C nvim.tar.gz
+    xattr -c nvim.tar.gz
 fi
 
 # Extract the downloaded tarball
 
-tar xzvf nvim.tar.gz -C /opt
+if [[ "$OS" == "macos" ]]; then
+   sudo tar xzvf nvim.tar.gz -C /opt
+else
+   tar xzvf nvim.tar.gz -C /opt
+fi
 
 # Create a symlink to the nvim binary
 if [[ -d /opt/nvim-${OS}-${ARCH}/bin ]]; then
-    sudo ln -sf /opt/nvim/bin/nvim /usr/local/bin/nvim
+    sudo ln -sf /opt/nvim-${OS}-${ARCH}/bin/nvim /usr/local/bin/nvim
 else
     echo "Neovim binary not found in the expected location. Please check the installation."
     exit 1
 fi
 
 # Install lua and luarocks if not already installed
-if ! command -v lua &> /dev/null; then
-    echo "Lua is not installed. Installing Lua..."
     if [[ "${OS}" == "macos" ]]; then
-        brew install lua
+        brew install luajit
     else
         sudo apt-get update
-        sudo apt-get install -y lua5.3
+        sudo apt-get install -y lua5.1
     fi
-fi
 
-if ! command -v luarocks &> /dev/null; then
-    echo "Luarocks is not installed. Installing Luarocks..."
     if [[ "${OS}" == "macos" ]]; then
         brew install luarocks
     else
         sudo apt-get install -y luarocks
     fi
-fi
+
 
 # Clean up
 rm nvim.tar.gz

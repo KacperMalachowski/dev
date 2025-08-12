@@ -33,7 +33,13 @@ log() {
 
 log "RUN: env $env -- grep: $grep"
 
-runs_dir=`find $script_dir/runs -mindepth 1 -maxdepth 1 -executable`
+OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
+
+if [ "${OS}" == "darwin" ]; then
+  runs_dir=`find $script_dir/runs -mindepth 1 -maxdepth 1 -perm +111`
+else
+  runs_dir=`find $script_dir/runs -mindepth 1 -maxdepth 1 -executable`
+fi
 
 for s in $runs_dir; do
     if basename $s | grep -vq "$grep"; then
