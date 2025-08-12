@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-pushd ~/personal/dev/env/.config/nvim
+pushd $DEV_ENV/env/.config/nvim
 git add .
 git commit -m 'automated dev commit'
 git push
 popd
 
-pushd ~/personal/dev
+pushd $DEV_ENV
 git add .
 git commit -m 'automated dev commit'
 git push
