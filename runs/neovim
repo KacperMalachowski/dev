@@ -41,6 +41,8 @@ else
    tar xzvf nvim.tar.gz -C /opt
 fi
 
+rm nvim.tar.gz
+
 # Create a symlink to the nvim binary
 if [[ -d /opt/nvim-${OS}-${ARCH}/bin ]]; then
     sudo ln -sf /opt/nvim-${OS}-${ARCH}/bin/nvim /usr/local/bin/nvim
@@ -50,19 +52,16 @@ else
 fi
 
 # Install lua and luarocks if not already installed
-    if [[ "${OS}" == "macos" ]]; then
-        brew install luajit
-    else
-        sudo apt-get update
-        sudo apt-get install -y lua5.1
-    fi
+if [[ "${OS}" == "macos" ]]; then
+    brew install luajit
+else
+    sudo apt-get update
+    sudo apt-get install -y lua5.1
+fi
 
-    if [[ "${OS}" == "macos" ]]; then
-        brew install luarocks
-    else
-        sudo apt-get install -y luarocks
-    fi
+if [[ "${OS}" == "macos" ]]; then
+    brew install luarocks
+else
+    sudo apt-get install -y luarocks
+fi
 
-
-# Clean up
-rm nvim.tar.gz
