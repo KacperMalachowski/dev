@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+
+# Install neovim using the latest release from GitHub.
+# It should work both on macOS and Linux.
+
+set -euo pipefail
+
+OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
+ARCH="$(uname -m)"
+
+if [[ "${OS}" == "darwin" ]]; then
+    OS="macos"
+fi
+
+echo "Installing Neovim for ${OS} on ${ARCH}..."
+
+URL="https://github.com/neovim/neovim/releases/latest/download/nvim-${OS}-${ARCH}.tar.gz"
+
+if ! command -v curl &> /dev/null; then
+    echo "curl is not installed. Please install it and try again."
+    exit 1
+fi
+
+if ! command -v tar &> /dev/null; then
+    echo "tar is not installed. Please install it and try again."
+    exit 1
+fi
+
+# Download the latest Neovim release
+curl -L "${URL}" -o nvim.tar.gz
+
+if [[ "$OS" == "macos" ]]; then
+    xattr -C nvim.tar.gz
+fi
+
+# Extract the downloaded tarball
+
+tar xzvf nvim.tar.gz -C /opt
+
+# Create a symlink to the nvim binary
+if [[ -d /opt/nvim-${OS}-${ARCH}/bin ]]; then
+    sudo ln -sf /opt/nvim/bin/nvim /usr/local/bin/nvim
+else
+    echo "Neovim binary not found in the expected location. Please check the installation."
+    exit 1
+fi
+
+# Install lua and luarocks if not already installed
+if ! command -v lua &> /dev/null; then
+    echo "Lua is not installed. Installing Lua..."
+    if [[ "${OS}" == "macos" ]]; then
+        brew install lua
+    else
+        sudo apt-get update
+        sudo apt-get install -y lua5.3
+    fi
+fi
+
+if ! command -v luarocks &> /dev/null; then
+    echo "Luarocks is not installed. Installing Luarocks..."
+    if [[ "${OS}" == "macos" ]]; then
+        brew install luarocks
+    else
+        sudo apt-get install -y luarocks
+    fi
+fi
+
+# Clean up
+rm nvim.tar.gz
