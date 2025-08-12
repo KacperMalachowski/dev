@@ -15,7 +15,7 @@ if [[ "${OS}" == "linux" ]]; then
         exit 1
     fi
 elif [[ "${OS}" == "darwin" ]]; then
-    brew install --cask docker
+    brew install docker
 else
     echo "Unsupported operating system: ${OS}"
     exit 1
