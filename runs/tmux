@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-OS=$(uname -s | tr '[:upper:]' '[:lower:]')
-
-if [ "$OS" = "linux" ]; then
-    apt install -y tmux
-elif [ "$OS" = "darwin" ]; then
-    brew install tmux
-fi
