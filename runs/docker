@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+# Install Google Cloud SDK
+if ! command -v gcloud &> /dev/null; then
+    echo "Installing Google Cloud SDK..."
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+        curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo tee /usr/share/keyrings/cloud.google.gpg
+        sudo apt-get update
+        sudo apt-get install -y google-cloud-sdk
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        brew install --cask google-cloud-sdk
+    fi
+else
+    echo "Google Cloud SDK is already installed"
+fi
+
+# Install kubectl
+if ! command -v kubectl &> /dev/null; then
+    echo "Installing kubectl..."
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+        sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+        rm kubectl
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        brew install kubectl
+    fi
+else
+    echo "kubectl is already installed"
+fi
+
+# Install Podman
+if ! command -v podman &> /dev/null; then
+    echo "Installing Podman..."
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        sudo apt-get update
+        sudo apt-get install -y podman
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        brew install podman
+    fi
+else
+    echo "Podman is already installed"
+fi
+

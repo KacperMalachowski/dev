@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+# Install neovim lua51 and luarocks
+if ! command -v nvim &> /dev/null; then
+    echo "neovim could not be found, installing..."
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        sudo apt-get update
+        sudo apt-get install -y neovim
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        brew install neovim
+    else
+        echo "Unsupported OS. Please install neovim manually."
+        exit 1
+    fi
+else
+    echo "neovim is already installed."
+fi
+
+if ! command -v luarocks &> /dev/null; then
+    echo "luarocks could not be found, installing..."
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        sudo apt-get update
+        sudo apt-get install -y luarocks
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        brew install luarocks
+    else
+        echo "Unsupported OS. Please install luarocks manually."
+        exit 1
+    fi
+else
+    echo "luarocks is already installed."
+fi
+
+if ! command -v lua &> /dev/null; then
+    echo "lua could not be found, installing..."
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        sudo apt-get update
+        sudo apt-get install -y lua51
+        sudo ln -s /usr/bin/lua5.1 /usr/local/bin/lua
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        brew install lua@5.1
+        brew link --force lua@5.1
+    else
+        echo "Unsupported OS. Please install lua manually."
+        exit 1
+    fi
+else
+    echo "lua is already installed."
+fi
