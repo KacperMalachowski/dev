@@ -3,4 +3,4 @@
     url = git@github.com:KacperMalachowski/nvim.git
 [submodule "tmux-sessionizer"]
     path = tmux-sessionizer
-    url = git@github.com:ThePrimeagen/tmux-sessionizer.git
+    url = git@github.com:KacperMalachowski/tmux-sessionizer.git

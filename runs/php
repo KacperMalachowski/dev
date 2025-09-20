@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+# Install php
+if ! command -v php &> /dev/null; then
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        if [ -f /etc/debian_version ]; then
+            sudo apt update
+            sudo apt install -y php-cli php-mbstring php-xml php-curl php-zip
+        elif [ -f /etc/redhat-release ]; then
+            sudo yum install -y epel-release
+            sudo yum install -y php-cli php-mbstring php-xml php-curl php-zip
+        fi
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        if ! command -v brew &> /dev/null; then
+            echo "Homebrew not found. Installing Homebrew..."
+            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        fi
+        brew install php
+    else
+        echo "Unsupported OS. Please install PHP manually."
+        exit 1
+    fi
+else
+    echo "PHP is already installed."
+fi
+

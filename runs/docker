@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!g/usr/bin/env bash
 
 # Install Google Cloud SDK
 if ! command -v gcloud &> /dev/null; then
