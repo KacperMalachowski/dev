@@ -1,0 +1,133 @@
+#!/usr/bin/env bash
+
+set -e
+
+# Install dev tools like go, node, python, ansible, terraform, gcloud, kubectl, docker
+
+# Install Go
+if ! command -v go &> /dev/null; then
+    echo "Installing Go..."
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        GO_VERSION="1.20.5"
+        wget https://go.dev/dl/go$GO_VERSION.linux-amd64.tar.gz
+        sudo tar -C /usr/local -xzf go$GO_VERSION.linux-amd64.tar.gz
+        rm go$GO_VERSION.linux-amd64.tar.gz
+        echo "export PATH=$PATH:/usr/local/go/bin" >> ~/.profile
+        # shellcheck disable=SC1090
+        source ~/.profile
+    elif [[ $OSTYPE == "darwin"* ]]; then
+        brew install go
+    fi
+else
+    echo "Go is already installed"
+fi
+
+# Install Air
+if ! command -v air &> /dev/null; then
+    echo "Installing Air..."
+    go install github.com/air-verse/air@latest
+    # shellcheck disable=SC1090
+    source ~/.profile
+else
+    echo "Air is already installed"
+fi
+
+# Install Node.js and npm
+if ! command -v node &> /dev/null; then
+    echo "Installing Node.js and npm..."
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+        sudo apt-get install -y nodejs
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        brew install node
+    fi
+else
+    echo "Node.js and npm are already installed"
+fi
+
+# Install N version manager
+if ! command -v n &> /dev/null; then
+    echo "Installing N version manager..."
+    sudo npm install -g n
+    sudo n stable
+else
+    echo "N version manager is already installed"
+fi
+
+# Install tldr
+if ! command -v tldr &> /dev/null; then
+    echo "Installing tldr..."
+    sudo npm install -g tldr
+else
+    echo "tldr is already installed"
+fi
+
+# Install Deno
+if ! command -v deno &> /dev/null; then
+    echo "Installing Deno..."
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        curl -fsSL https://deno.land/install.sh | sh -s -- -y
+        # shellcheck disable=SC1090
+        source ~/.profile
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        brew install deno
+    fi
+else
+    echo "Deno is already installed"
+fi
+
+# Install Python and pip
+if ! command -v python3 &> /dev/null; then
+    echo "Installing Python and pip..."
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        sudo apt-get update
+        sudo apt-get install -y python3 python3-pip
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+
+        brew install python
+    fi
+else
+    echo "Python and pip are already installed"
+fi
+
+# Install Ansible
+if ! command -v ansible &> /dev/null; then
+    echo "Installing Ansible..."
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        sudo apt-get update
+        sudo apt-get install -y ansible
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        brew install ansible
+    fi
+else
+    echo "Ansible is already installed"
+fi
+
+# Install OpenTofu
+if ! command -v tofu &> /dev/null; then
+    echo "Installing OpenTofu..."
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        curl --proto '=https' --tlsv1.2 -fsSL https://get.opentofu.org/install-opentofu.sh -o install-opentofu.sh
+        chmod +x install-opentofu.sh
+        ./install-opentofu.sh --install-method deb
+        rm install-opentofu.sh
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        brew install opentofu
+    fi
+else
+    echo "Open Tofu is already installed"
+fi
+
+# Install fzf
+if ! command -v fzf &> /dev/null; then
+    echo "Installing fzf..."
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        sudo apt-get update
+        sudo apt-get install -y fzf
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        brew install fzf
+    fi
+else
+    echo "fzf is already installed"
+fi
+
