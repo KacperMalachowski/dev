@@ -1,67 +1,49 @@
 #!/usr/bin/env bash
 
-# Install neovim using the latest release from GitHub.
-# It should work both on macOS and Linux.
-
-set -euo pipefail
-
-OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
-ARCH="$(uname -m)"
-
-if [[ "${OS}" == "darwin" ]]; then
-    OS="macos"
-fi
-
-echo "Installing Neovim for ${OS} on ${ARCH}..."
-
-URL="https://github.com/neovim/neovim/releases/latest/download/nvim-${OS}-${ARCH}.tar.gz"
-
-if ! command -v curl &> /dev/null; then
-    echo "curl is not installed. Please install it and try again."
-    exit 1
-fi
-
-if ! command -v tar &> /dev/null; then
-    echo "tar is not installed. Please install it and try again."
-    exit 1
-fi
-
-# Download the latest Neovim release
-curl -L "${URL}" -o nvim.tar.gz
-
-if [[ "$OS" == "macos" ]]; then
-    xattr -c nvim.tar.gz
-fi
-
-# Extract the downloaded tarball
-
-if [[ "$OS" == "macos" ]]; then
-   sudo tar xzvf nvim.tar.gz -C /opt
+# Install neovim lua51 and luarocks
+if ! command -v nvim &> /dev/null; then
+    echo "neovim could not be found, installing..."
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        sudo apt-get update
+        sudo apt-get install -y neovim
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        brew install neovim
+    else
+        echo "Unsupported OS. Please install neovim manually."
+        exit 1
+    fi
 else
-   tar xzvf nvim.tar.gz -C /opt
+    echo "neovim is already installed."
 fi
 
-rm nvim.tar.gz
-
-# Create a symlink to the nvim binary
-if [[ -d /opt/nvim-${OS}-${ARCH}/bin ]]; then
-    sudo ln -sf /opt/nvim-${OS}-${ARCH}/bin/nvim /usr/local/bin/nvim
+if ! command -v luarocks &> /dev/null; then
+    echo "luarocks could not be found, installing..."
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        sudo apt-get update
+        sudo apt-get install -y luarocks
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        brew install luarocks
+    else
+        echo "Unsupported OS. Please install luarocks manually."
+        exit 1
+    fi
 else
-    echo "Neovim binary not found in the expected location. Please check the installation."
-    exit 1
+    echo "luarocks is already installed."
 fi
 
-# Install lua and luarocks if not already installed
-if [[ "${OS}" == "macos" ]]; then
-    brew install luajit
+if ! command -v lua &> /dev/null; then
+    echo "lua could not be found, installing..."
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        sudo apt-get update
+        sudo apt-get install -y lua51
+        sudo ln -s /usr/bin/lua5.1 /usr/local/bin/lua
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        brew install lua@5.1
+        brew link --force lua@5.1
+    else
+        echo "Unsupported OS. Please install lua manually."
+        exit 1
+    fi
 else
-    sudo apt-get update
-    sudo apt-get install -y lua5.1
+    echo "lua is already installed."
 fi
-
-if [[ "${OS}" == "macos" ]]; then
-    brew install luarocks
-else
-    sudo apt-get install -y luarocks
-fi
-

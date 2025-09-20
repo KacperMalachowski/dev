@@ -1,16 +1,29 @@
 #!/usr/bin/env bash
 
-script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd )
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    sudo apt -y update
 
-export DEV_ENV=$script_dir
+    if ! command -v git &> /dev/null; then
+        sudo apt -y install git
+    fi
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    brew update
 
-# Initialize the script
-$script_dir/init
+    if ! command -v git &> /dev/null; then
+        brew install git
+    fi
+else
+    echo "Unsupported OS: $OSTYPE"
+    exit 1
+fi
 
-# Install required packages with run
+if [ ! -d "HOME/personal" ]; then
+    mkdir "$HOME/personal"
+fi
 
-$script_dir/run
+git clone https://github.com/KacperMalachowski/dev "$HOME/personal/dev"
 
-# Setup the environment
+pushd "$HOME/personal/dev" || exit
+./run
+popd || exit
 
-$script_dir/dev-env
