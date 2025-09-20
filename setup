@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    sudo apt -y update
+
+    if ! command -v git &> /dev/null; then
+        sudo apt -y install git
+    fi
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    brew update
+
+    if ! command -v git &> /dev/null; then
+        brew install git
+    fi
+else
+    echo "Unsupported OS: $OSTYPE"
+    exit 1
+fi
+
+if [ ! -d "HOME/personal" ]; then
+    mkdir "$HOME/personal"
+fi
+
+git clone https://github.com/KacperMalachowski/dev "$HOME/personal/dev"
+
+pushd "$HOME/personal/dev" || exit
+./run
+popd || exit
+
