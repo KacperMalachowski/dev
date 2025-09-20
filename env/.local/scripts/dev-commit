@@ -4,17 +4,17 @@ pushd ~/personal/dev/env/.config/nvim || exit
 git add .
 git commit -m 'automated dev commit'
 git push
-popd
+popd || exit
 
 pushd ~/personal/dev/tmux-sessionizer || exit
 git add .
 git commit -m 'automated dev commit'
 git push
-popd
+popd || exit
 
 pushd ~/personal/dev || exit
 git add .
 git commit -m 'automated dev commit'
 git push
-popd
+popd || exit
 
