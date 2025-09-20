@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    sudo apt-get install gdb -y
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    brew install gdb
+else
+    echo "Unsupported OS type: $OSTYPE"
+    exit 1
+fi

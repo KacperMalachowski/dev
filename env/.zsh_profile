@@ -1,19 +1,25 @@
-export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_CONFIG_HOME=$HOME/.config
 VIM="nvim"
 
 PERSONAL=$XDG_CONFIG_HOME/personal
 DEV_ENV=$HOME/dev
-for i in `find -L $PERSONAL`; do
+for i in $(find -L $PERSONAL); do
     source $i
 done
 
-# Fuzzy Finder
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+[ -f ~/.fzf/zsh ] && source ~/.fzf.zsh
 
 export GOPATH=$HOME/.local/go
 export GIT_EDITOR=$VIM
-export LANG="en_US.UTF-8" # Nice one MacOS, I need to set this manually
+export DENO_INSTALL="$HOME/.deno"
+export N_PREFIX="$HOME/.local/n"
 export DEV_ENV_HOME="$HOME/personal/dev"
+
+bindkey -s ^f "tmux-sessionizer\n"
+bindkey -s '\eh' "tmux-sessionizer -s 0\n"
+bindkey -s '\et' "tmux-sessionizer -s 1\n"
+bindkey -s '\en' "tmux-sessionizer -s 2\n"
+bindkey -s '\es' "tmux-sessionizer -s 3\n"
 
 addToPath() {
     if [[ "$PATH" != *"$1"* ]]; then
@@ -28,17 +34,17 @@ addToPathFront() {
 }
 
 addToPathFront $HOME/.local/.npm-global/bin
+addToPathFront $HOME/.local/apps
 addToPathFront $HOME/.local/scripts
 addToPathFront $HOME/.local/bin
 addToPathFront $HOME/.local/npm/bin
+addToPathFront $HOME/.local/n/bin
 
 addToPathFront $HOME/.local/go/bin
 addToPathFront /usr/local/go/bin
+addToPathFront $HOME/.deno/bin
+addToPath $HOME/.cargo/bin
 addToPath $HOME/.local/personal
 addToPath $HOME/.npm-global/bin
 
-bindkey -s ^f "tmux-sessionizer\n"
-bindkey -s '\eh' "tmux-sessionizer -s 0\n"
-bindkey -s '\et' "tmux-sessionizer -s 1\n"
-bindkey -s '\en' "tmux-sessionizer -s 2\n"
-bindkey -s '\es' "tmux-sessionizer -s 3\n"
+alias gt='NODE_OPTIONS="--no-deprecation" gt'

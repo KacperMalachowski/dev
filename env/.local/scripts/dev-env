@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+(
+    pushd "$HOME/dev" || exit
+    ./dev-env
+    hash -r
+)

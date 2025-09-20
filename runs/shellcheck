@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+# Install shellcheck if not already installed
+if ! command -v shellcheck &> /dev/null; then
+    echo "shellcheck not found, installing..."
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        sudo apt-get update
+        sudo apt-get install -y shellcheck
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        brew install shellcheck
+    else
+        echo "Unsupported OS. Please install shellcheck manually."
+        exit 1
+    fi
+else
+    echo "shellcheck is already installed."
+fi
+

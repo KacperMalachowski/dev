@@ -1,30 +1,84 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+# Install dependencies
 
-OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
-ARCH="$(uname -m)"
-
-if [[ "${OS}" == "darwin" ]]; then
-    OS="macos"
-fi
-
-echo "Installing git, ripgrep, xclip, jq, tldr, and python3-pip for ${OS} on ${ARCH}..."
-
-if [[ "${OS}" == "macos" ]]; then
-    if ! command -v brew &> /dev/null; then
-        echo "Homebrew is not installed. Please install Homebrew first."
+# git
+if ! command -v git &> /dev/null
+then
+    echo "git could not be found, installing..."
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        sudo apt-get update
+        sudo apt-get install -y git
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        brew install git
+    else
+        echo "Unsupported OS. Please install git manually."
         exit 1
     fi
-    brew install git ripgrep xclip jq tldr python3
 else
-    if ! command -v apt &> /dev/null; then
-        echo "apt is not available. This script is intended for Debian-based systems."
-        exit 1
-    fi
-    sudo apt -y update
-    sudo apt -y install git ripgrep xclip jq tldr python3-pip
+    echo "git is already installed."
 fi
 
-git clone git@github.com:junegunn/fzf.git $HOME/personal/fzf
-$HOME/personal/fzf/install
+# ripgrep
+if ! command -v rg &> /dev/null; then
+    echo "ripgrep could not be found, installing..."
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        sudo apt-get update
+        sudo apt-get install -y ripgrep
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        brew install ripgrep
+    else
+        echo "Unsupported OS. Please install ripgrep manually."
+        exit 1
+    fi
+else
+    echo "ripgrep is already installed."
+fi
+
+# jq
+if ! command -v jq &> /dev/null; then
+    echo "jq could not be found, installing..."
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        sudo apt-get update
+        sudo apt-get install -y jq
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        brew install jq
+    else
+        echo "Unsupported OS. Please install jq manually."
+        exit 1
+    fi
+else
+    echo "jq is already installed."
+fi
+
+# yq
+if ! command -v yq &> /dev/null; then
+    echo "yq could not be found, installing..."
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        sudo apt-get update
+        sudo apt-get install -y yq
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        brew install yq
+    else
+        echo "Unsupported OS. Please install yq manually."
+        exit 1
+    fi
+else
+    echo "yq is already installed."
+fi
+
+# xclip
+if ! command -v xclip &> /dev/null; then
+    echo "xclip could not be found, installing..."
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        sudo apt-get update
+        sudo apt-get install -y xclip
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        brew install xclip
+    else
+        echo "Unsupported OS. Please install xclip manually."
+        exit 1
+    fi
+else
+    echo "xclip is already installed."
+fi

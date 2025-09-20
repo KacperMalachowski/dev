@@ -3,14 +3,11 @@
 git submodule init
 git submodule update
 
-pushd env/.config/nvim
-
+pushd env/.config/nvim || exit
 git checkout main
+popd || exit
 
-popd
-
-cd tmux-sessionizer
-
+pushd tmux-sessionizer || exit
 git checkout master
+popd || exit
 
-cd ..
