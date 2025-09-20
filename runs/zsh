@@ -1,15 +1,15 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env bash
 
 # Install zsh and oh-my-zsh
 if ! command -v zsh &> /dev/null; then
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         sudo apt update && sudo apt install -y zsh
         hash -r
-        sudo chsh -s $(which zsh)
+        sudo chsh -s "$(which zsh)"
         sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
     elif [[ "$OSTYPE" == "darwin"* ]]; then
         brew install zsh
-        chsh -s $(which zsh)
+        chsh -s "$(which zsh)"
         sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
     fi
 else

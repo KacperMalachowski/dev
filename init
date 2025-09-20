@@ -5,9 +5,9 @@ git submodule update
 
 pushd env/.config/nvim || exit
 git checkout main
-popd
+popd || exit
 
 pushd tmux-sessionizer || exit
 git checkout master
-popd
+popd || exit
 
