@@ -23,6 +23,8 @@ fi
 
 git clone https://github.com/KacperMalachowski/dev "$HOME/personal/dev"
 
+export DEV_ENV="$HOME/personal/dev"
+
 pushd "$HOME/personal/dev" || exit
 ./run
 popd || exit
