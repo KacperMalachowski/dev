@@ -39,7 +39,12 @@ log() {
 
 log "RUN: env $DEV_ENV -- grep $grep"
 
-runs_dir=$(find "$script_dir/runs" -mindepth 1 -maxdepth 1 -executable)
+runs_dir=""
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    runs_dir=$(find "$script_dir/runs" -type f -perm +111)
+else
+    runs_dir=$(find "$script_dir/runs" -type f -executable)
+fi
 
 for s in $runs_dir; do
     if basename "$s" | grep -vq "$grep"; then
