@@ -21,7 +21,7 @@ if [ ! -d "HOME/personal" ]; then
     mkdir "$HOME/personal"
 fi
 
-git clone https://github.com/KacperMalachowski/dev "$HOME/personal/dev"
+git clone git@github.com:KacperMalachowski/dev.git "$HOME/personal/dev"
 
 export DEV_ENV="$HOME/personal/dev"
 
