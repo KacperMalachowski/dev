@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+set -e
+
+# Install gcloud CLI
+if ! command -v gcloud &> /dev/null; then
+    echo "Installing gcloud CLI..."
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        echo "Downloading gcloud SDK for Linux..."
+        curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-548.0.0-linux-x86_64.tar.gz
+        tar -xvf google-cloud-cli-548.0.0-linux-x86_64.tar.gz
+        ./google-cloud-sdk/install.sh -q
+        rm google-cloud-cli-548.0.0-linux-x86_64.tar.gz
+        echo "export PATH=$PATH:$(pwd)/google-cloud-sdk/bin" >> ~/.profile
+        # shellcheck disable=SC1090
+        source ~/.profile
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        brew install --cask google-cloud-sdk
+    fi
+fi
