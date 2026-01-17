@@ -2,7 +2,7 @@
 
 # Install OpenCode CLI tool
 if ! command -v opencode &> /dev/null; then
-    curl -sSL https://opencode.ai/install | bash - --no-modify-path
+    curl -sSL https://opencode.ai/install | bash -s -- --no-modify-path
 else
     echo "OpenCode is already installed."
 fi
