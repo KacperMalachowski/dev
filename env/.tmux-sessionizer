@@ -5,6 +5,11 @@ if [[ "$(pwd)" == $HOME/personal ]]; then
     return
 fi
 
+if [[ "$(pwd)" == $HOME/work ]]; then
+    clear
+    return
+fi
+
 tmux new-window -dn scratch
 vim .
 clear
