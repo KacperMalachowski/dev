@@ -49,3 +49,6 @@ addToPath $HOME/.npm-global/bin
 addToPath $HOME/.opencode/bin
 
 alias gt='NODE_OPTIONS="--no-deprecation" gt'
+
+export TERRAFORM_EXEC_PATH=$(which tofu)
+
