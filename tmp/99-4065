@@ -1,4 +1,0 @@
-
-pushd tmux-sessionizer || exit
-git checkout master
-popd || exit
