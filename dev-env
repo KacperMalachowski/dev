@@ -42,7 +42,7 @@ update_files() {
                 rm -rf "$directory"
             fi
 
-            log ">>> Copying env: cp $c $2"
+            log ">>> Copying env: cp $1/${c#./} $2"
             if [[ $dry_run == "0" ]]; then
                 cp -r "./$c" "$2"
             fi
@@ -65,6 +65,7 @@ copy() {
 
 update_files "$DEV_ENV/env/.config" "$XDG_CONFIG_HOME"
 update_files "$DEV_ENV/env/.local" "$HOME/.local"
+update_files "$DEV_ENV/env/.agents" "$HOME/.agents"
 
 copy "$DEV_ENV/tmux-sessionizer/tmux-sessionizer" "$HOME/.local/scripts/tmux-sessionizer"
 copy "$DEV_ENV/env/.zsh_profile" "$HOME/.zsh_profile"
