@@ -4,5 +4,17 @@
         "README.md",
         "docs/**/*.md",
         "adr/**/*.md"
-    ]
+    ],
+    "agent": {
+        "99-build": {
+            "mode": "primary",
+            "description": "Agent for 99 plugin - completes task and exits immediately",
+            "steps": 5,
+            "permission": {
+                "question": "deny",
+                "todowrite": "deny",
+                "todoread": "deny"
+            }
+        }
+    }
 }
