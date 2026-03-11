@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# Wrapper for opencode that auto-exits after writing to temp file
+# Usage: opencode-99-wrapper <temp_file> <prompt>
+
+TEMP_FILE="$1"
+shift
+PROMPT="$@"
+
+# Start opencode in background
+opencode run --agent build -m github-copilot/claude-sonnet-4.6 "$PROMPT" &
+OPENCODE_PID=$!
+
+# Monitor the temp file for writes
+INITIAL_SIZE=$(stat -c%s "$TEMP_FILE" 2>/dev/null || echo "0")
+TIMEOUT=60
+ELAPSED=0
+
+while [ $ELAPSED -lt $TIMEOUT ]; do
+    sleep 0.5
+    ELAPSED=$((ELAPSED + 1))
+    
+    # Check if file has been written to
+    CURRENT_SIZE=$(stat -c%s "$TEMP_FILE" 2>/dev/null || echo "0")
+    
+    if [ "$CURRENT_SIZE" -gt "$INITIAL_SIZE" ] && [ "$CURRENT_SIZE" -gt 0 ]; then
+        # File has been written, wait a bit more to ensure completion
+        sleep 1
+        # Kill the opencode process
+        kill $OPENCODE_PID 2>/dev/null
+        exit 0
+    fi
+    
+    # Check if process already exited
+    if ! kill -0 $OPENCODE_PID 2>/dev/null; then
+        wait $OPENCODE_PID
+        exit $?
+    fi
+done
+
+# Timeout - kill the process
+kill $OPENCODE_PID 2>/dev/null
+exit 1
