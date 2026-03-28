@@ -9,7 +9,7 @@
         "99-build": {
             "mode": "primary",
             "description": "Agent for 99 plugin - completes task and exits immediately",
-            "steps": 5,
+            "steps": 20,
             "permission": {
                 "question": "deny",
                 "todowrite": "deny",
