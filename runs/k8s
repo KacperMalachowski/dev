@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    wget https://github.com/derailed/k9s/releases/download/v0.50.18/k9s_linux_amd64.deb
+    sudo apt install ./k9s_linux_amd64.deb
+    rm k9s_linux_amd64.deb
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    brew install derailed/k9s/k9s
+else
+    echo "Unsupported OS type: $OSTYPE"
+    exit 1
+fi
+
+
