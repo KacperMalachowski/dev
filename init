@@ -11,3 +11,6 @@ pushd tmux-sessionizer || exit
 git checkout master
 popd || exit
 
+pushd env/.config/opencode-personal || exit
+git checkout master
+popd || exit

@@ -4,3 +4,6 @@
 [submodule "tmux-sessionizer"]
     path = tmux-sessionizer
     url = git@github.com:KacperMalachowski/tmux-sessionizer.git
+[submodule "env/.config/.ai"]
+	path = env/.config/.ai
+	url = git@github.com:KacperMalachowski/.ai.git

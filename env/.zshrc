@@ -100,5 +100,13 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+
+# GitHub token for OpenCode MCP
+export GITHUB_TOKEN=$(gh auth token)
+
+# Cloudflare credentials for OpenCode MCP
+export CLOUDFLARE_API_TOKEN=$(cat ~/.secrets/cloudflare-api-token 2>/dev/null)
+export CLOUDFLARE_ACCOUNT_ID=$(cat ~/.secrets/cloudflare-account-id 2>/dev/null)
+
 source ~/.zsh_profile
 

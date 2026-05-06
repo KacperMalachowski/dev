@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 dry_run="0"
 
 if [ -z "$XDG_CONFIG_HOME" ]; then
@@ -12,7 +14,7 @@ if [ -z "$DEV_ENV" ]; then
     exit 1
 fi
 
-if [[ $1 == "--dry" ]]; then
+if [[ "${1:-}" == "--dry" ]]; then
     dry_run="1"
 fi
 
@@ -34,6 +36,11 @@ update_files() {
     (
         configs=$(find . -mindepth 1 -maxdepth 1 -type d)
         for c in $configs; do
+            # Skip .ai - handled separately by build script
+            if [[ "$c" == "./.ai" ]]; then
+                continue
+            fi
+
             directory=${2%/}/${c#./}
 
             log ">>> Removing: rm -rf $directory"
@@ -42,9 +49,9 @@ update_files() {
                 rm -rf "$directory"
             fi
 
-            log ">>> Copying env: cp $1/${c#./} $2"
+            log ">>> Copying env: cp $1/${c#./} $directory"
             if [[ $dry_run == "0" ]]; then
-                cp -r "./$c" "$2"
+                cp -r "./$c" "$directory"
             fi
         done
     )
@@ -65,6 +72,14 @@ copy() {
 
 update_files "$DEV_ENV/env/.config" "$XDG_CONFIG_HOME"
 update_files "$DEV_ENV/env/.local" "$HOME/.local"
+
+# Build OpenCode config from .ai repo (base + overlay)
+log "Building OpenCode config..."
+if [[ $dry_run == "0" ]]; then
+    "$DEV_ENV/env/.config/.ai/build"
+else
+    log "[DRY RUN]: $DEV_ENV/env/.config/.ai/build"
+fi
 
 copy "$DEV_ENV/tmux-sessionizer/tmux-sessionizer" "$HOME/.local/scripts/tmux-sessionizer"
 copy "$DEV_ENV/env/.zsh_profile" "$HOME/.zsh_profile"
