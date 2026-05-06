@@ -61,7 +61,7 @@ update_files() {
 copy() {
     log "Removing: $2"
     if [[ $dry_run == "0" ]]; then
-        rm "$2"
+        rm "$2" || echo "File $2 does not exist, skipping removal"
     fi
 
     log "Copying: $1 to $2"
@@ -73,16 +73,12 @@ copy() {
 update_files "$DEV_ENV/env/.config" "$XDG_CONFIG_HOME"
 update_files "$DEV_ENV/env/.local" "$HOME/.local"
 
-# Build OpenCode config from .ai repo (base + overlay)
-log "Building OpenCode config..."
-if [[ $dry_run == "0" ]]; then
-    "$DEV_ENV/env/.config/.ai/build"
-else
-    log "[DRY RUN]: $DEV_ENV/env/.config/.ai/build"
-fi
-
 copy "$DEV_ENV/tmux-sessionizer/tmux-sessionizer" "$HOME/.local/scripts/tmux-sessionizer"
 copy "$DEV_ENV/env/.zsh_profile" "$HOME/.zsh_profile"
 copy "$DEV_ENV/env/.zshrc" "$HOME/.zshrc"
 copy "$DEV_ENV/env/.tmux-sessionizer" "$HOME/.tmux-sessionizer"
 copy "$DEV_ENV/dev-env" "$HOME/.local/scripts/dev-env"
+
+# Build OpenCode config from .ai repo (base + overlay)
+log "Building OpenCode config..."
+"$DEV_ENV/env/.config/.ai/build"
