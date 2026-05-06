@@ -12,6 +12,12 @@ git commit -m 'automated dev commit'
 git push
 popd || exit
 
+pushd ~/personal/dev/env/.config/.ai || exit
+git add .
+git commit -m 'automated dev commit'
+git push
+popd || exit
+
 pushd ~/personal/dev || exit
 git add .
 git commit -m 'automated dev commit'
