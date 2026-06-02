@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+set -e
+
+# Install GitHub MCP Server
+if ! command -v github-mcp-server &> /dev/null; then
+    echo "Installing GitHub MCP Server..."
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        echo "Linux installation not supported yet. Please install manually from https://github.com/github/github-mcp-server"
+        exit 1
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        brew install github-mcp-server
+    fi
+else
+    echo "GitHub MCP Server is already installed."
+fi
