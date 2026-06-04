@@ -46,6 +46,7 @@ addToPathFront $HOME/.deno/bin
 addToPath $HOME/.cargo/bin
 addToPath $HOME/.local/personal
 addToPath $HOME/.npm-global/bin
+addToPath $HOME/.opencode/bin
 
 alias gt='NODE_OPTIONS="--no-deprecation" gt'
 
