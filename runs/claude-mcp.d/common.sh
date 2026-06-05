@@ -1,0 +1,15 @@
+# shellcheck shell=bash
+# Common MCP servers — registered on every machine regardless of profile.
+# Sourced by runs/claude-mcp.
+
+# GitHub Copilot MCP (public github.com) — token from GITHUB_TOKEN env or gh CLI
+GITHUB_TOKEN="${GITHUB_TOKEN:-$(gh auth token 2>/dev/null)}"
+if [[ -z "$GITHUB_TOKEN" ]]; then
+    echo "No GitHub token found (set GITHUB_TOKEN or run 'gh auth login') — skipping githubcom."
+else
+    register_remote_mcp "http" "githubcom" \
+        "https://api.githubcopilot.com/mcp/" \
+        "Authorization: Bearer ${GITHUB_TOKEN}"
+fi
+
+register_stdio_mcp "context7" npx -y @upstash/context7-mcp
