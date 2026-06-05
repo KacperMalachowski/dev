@@ -79,6 +79,6 @@ copy "$DEV_ENV/env/.zshrc" "$HOME/.zshrc"
 copy "$DEV_ENV/env/.tmux-sessionizer" "$HOME/.tmux-sessionizer"
 copy "$DEV_ENV/dev-env" "$HOME/.local/scripts/dev-env"
 
-# Build OpenCode config from .ai repo (base + overlay)
-log "Building OpenCode config..."
+# Build Claude Code config from .ai repo (base + overlay)
+log "Building Claude Code config..."
 "$DEV_ENV/env/.config/.ai/build"
