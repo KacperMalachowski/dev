@@ -10,51 +10,45 @@ fi
 # Claude Code reads MCP servers from ~/.claude.json (user scope), not from
 # settings.json — so register them through the CLI rather than the .ai build.
 
-register_remote_mcp() {
-    local transport="$1"
-    local name="$2"
-    local url="$3"
-    local header="$4"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LIB_DIR="$SCRIPT_DIR/claude-mcp.d"
+DEV_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-    if claude mcp get "$name" &> /dev/null; then
-        echo "$name: already registered, skipping."
-        return
-    fi
+# Profile detection. Order:
+#   1. $CLAUDE_PROFILE (explicit override, useful for testing).
+#   2. The .ai work overlay submodule is initialized — gated by a .profile
+#      marker committed inside the (private, GHES-hosted) work submodule.
+#      Empty directory means uninitialized submodule, which means personal.
+#   3. Default: personal.
+WORK_MARKER="$DEV_ROOT/env/.config/.ai/overlays/work/.profile"
 
-    if [[ -n "$header" ]]; then
-        claude mcp add --transport "$transport" -s user "$name" "$url" --header "$header"
-    else
-        claude mcp add --transport "$transport" -s user "$name" "$url"
-    fi
-    echo "$name: registered."
-}
-
-register_stdio_mcp() {
-    local name="$1"
-    shift
-    local cmd=("$@")
-
-    if claude mcp get "$name" &> /dev/null; then
-        echo "$name: already registered, skipping."
-        return
-    fi
-
-    claude mcp add -s user "$name" -- "${cmd[@]}"
-    echo "$name: registered."
-}
-
-# GitHub Copilot MCP — prefer GITHUB_TOKEN env var, fall back to gh CLI
-GITHUB_TOKEN="${GITHUB_TOKEN:-$(gh auth token 2>/dev/null)}"
-if [[ -z "$GITHUB_TOKEN" ]]; then
-    echo "No GitHub token found (set GITHUB_TOKEN or run 'gh auth login') — skipping githubcom."
+if [[ -n "${CLAUDE_PROFILE:-}" ]]; then
+    PROFILE="$CLAUDE_PROFILE"
+elif [[ -f "$WORK_MARKER" ]]; then
+    PROFILE="work"
 else
-    register_remote_mcp "http" "githubcom" \
-        "https://api.githubcopilot.com/mcp/" \
-        "Authorization: Bearer ${GITHUB_TOKEN}"
+    PROFILE="personal"
 fi
 
-register_stdio_mcp "context7" npx -y @upstash/context7-mcp
-register_stdio_mcp "sequential-thinking" npx -y @modelcontextprotocol/server-sequential-thinking
+echo "Registering MCP servers [profile: $PROFILE]..."
 
-# Personal overlay
-register_remote_mcp "sse" "cloudflare" "https://mcp.cloudflare.com/mcp"
+# shellcheck source=claude-mcp.d/_lib.sh
+source "$LIB_DIR/_lib.sh"
+
+# shellcheck source=claude-mcp.d/common.sh
+source "$LIB_DIR/common.sh"
+
+case "$PROFILE" in
+    work)
+        # shellcheck source=claude-mcp.d/work.sh
+        source "$LIB_DIR/work.sh"
+        ;;
+    personal)
+        # shellcheck source=claude-mcp.d/personal.sh
+        source "$LIB_DIR/personal.sh"
+        ;;
+    *)
+        echo "Unknown profile: $PROFILE (expected 'work' or 'personal')" >&2
+        exit 1
+        ;;
+esac
