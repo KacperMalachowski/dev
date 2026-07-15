@@ -1,6 +1,5 @@
 # shellcheck shell=bash
-# Common MCP servers — registered on every machine regardless of profile.
-# Sourced by runs/claude-mcp.
+# MCP servers registered by runs/claude-mcp.
 
 # GitHub Copilot MCP (public github.com) — token from GITHUB_TOKEN env or gh CLI
 GITHUB_TOKEN="${GITHUB_TOKEN:-$(gh auth token 2>/dev/null)}"
@@ -13,3 +12,6 @@ else
 fi
 
 register_stdio_mcp "context7" npx -y @upstash/context7-mcp
+
+register_remote_mcp "sse" "cloudflare" "https://mcp.cloudflare.com/mcp"
+register_stdio_mcp "sequential-thinking" npx -y @modelcontextprotocol/server-sequential-thinking

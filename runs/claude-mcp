@@ -12,43 +12,11 @@ fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LIB_DIR="$SCRIPT_DIR/claude-mcp.d"
-DEV_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-# Profile detection. Order:
-#   1. $CLAUDE_PROFILE (explicit override, useful for testing).
-#   2. The .ai work overlay submodule is initialized — gated by a .profile
-#      marker committed inside the (private, GHES-hosted) work submodule.
-#      Empty directory means uninitialized submodule, which means personal.
-#   3. Default: personal.
-WORK_MARKER="$DEV_ROOT/env/.config/.ai/overlays/work/.profile"
-
-if [[ -n "${CLAUDE_PROFILE:-}" ]]; then
-    PROFILE="$CLAUDE_PROFILE"
-elif [[ -f "$WORK_MARKER" ]]; then
-    PROFILE="work"
-else
-    PROFILE="personal"
-fi
-
-echo "Registering MCP servers [profile: $PROFILE]..."
+echo "Registering MCP servers..."
 
 # shellcheck source=claude-mcp.d/_lib.sh
 source "$LIB_DIR/_lib.sh"
 
-# shellcheck source=claude-mcp.d/common.sh
-source "$LIB_DIR/common.sh"
-
-case "$PROFILE" in
-    work)
-        # shellcheck source=claude-mcp.d/work.sh
-        source "$LIB_DIR/work.sh"
-        ;;
-    personal)
-        # shellcheck source=claude-mcp.d/personal.sh
-        source "$LIB_DIR/personal.sh"
-        ;;
-    *)
-        echo "Unknown profile: $PROFILE (expected 'work' or 'personal')" >&2
-        exit 1
-        ;;
-esac
+# shellcheck source=claude-mcp.d/servers.sh
+source "$LIB_DIR/servers.sh"
