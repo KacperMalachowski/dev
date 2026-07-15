@@ -3,6 +3,20 @@
 # Sourced — not executed. Mark this file non-executable so the runs/ dispatcher
 # (run script) skips it when iterating executables.
 
+# Run `claude mcp add` without letting a single failure abort the whole run.
+# Some servers are refused by enterprise policy ("explicitly blocked by
+# enterprise policy") on managed machines; that must not stop the remaining
+# servers from registering under `set -e`. Returns 0 always; warns on failure.
+_mcp_add() {
+    local name="$1"
+    shift
+    if claude mcp add "$@"; then
+        echo "$name: registered."
+    else
+        echo "$name: could not be registered (blocked or add failed) — skipping." >&2
+    fi
+}
+
 register_remote_mcp() {
     local transport="$1"
     local name="$2"
@@ -15,11 +29,10 @@ register_remote_mcp() {
     fi
 
     if [[ -n "$header" ]]; then
-        claude mcp add --transport "$transport" -s user "$name" "$url" --header "$header"
+        _mcp_add "$name" --transport "$transport" -s user "$name" "$url" --header "$header"
     else
-        claude mcp add --transport "$transport" -s user "$name" "$url"
+        _mcp_add "$name" --transport "$transport" -s user "$name" "$url"
     fi
-    echo "$name: registered."
 }
 
 register_stdio_mcp() {
@@ -32,8 +45,7 @@ register_stdio_mcp() {
         return
     fi
 
-    claude mcp add -s user "$name" -- "${cmd[@]}"
-    echo "$name: registered."
+    _mcp_add "$name" -s user "$name" -- "${cmd[@]}"
 }
 
 # Register a stdio MCP with environment variables. Use when the server needs
@@ -55,8 +67,7 @@ register_stdio_mcp_with_env() {
         return
     fi
 
-    claude mcp add -s user "$name" "${env_args[@]}" -- "$@"
-    echo "$name: registered."
+    _mcp_add "$name" -s user "$name" "${env_args[@]}" -- "$@"
 }
 
 # Idempotent removal — silent if the server isn't registered.

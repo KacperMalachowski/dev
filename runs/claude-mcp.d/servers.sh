@@ -14,7 +14,8 @@ fi
 register_stdio_mcp "context7" npx -y @upstash/context7-mcp
 register_stdio_mcp "drawio" npx -y @drawio/mcp@1.4.0
 
-register_remote_mcp "sse" "cloudflare" "https://mcp.cloudflare.com/mcp"
-register_remote_mcp "sse" "opentofu" "https://mcp.opentofu.org/sse"
-register_remote_mcp "http" "google-dev-knowledge" "https://developerknowledge.googleapis.com/mcp"
+# Cloudflare & OpenTofu retired their SSE endpoints; both now serve
+# streamable HTTP at /mcp.
+register_remote_mcp "http" "cloudflare" "https://mcp.cloudflare.com/mcp"
+register_remote_mcp "http" "opentofu" "https://mcp.opentofu.org/mcp"
 register_stdio_mcp "sequential-thinking" npx -y @modelcontextprotocol/server-sequential-thinking
