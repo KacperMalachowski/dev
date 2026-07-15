@@ -4,12 +4,12 @@ set -euo pipefail
 
 dry_run="0"
 
-if [ -z "$XDG_CONFIG_HOME" ]; then
+if [ -z "${XDG_CONFIG_HOME:-}" ]; then
     echo "XDG_CONFIG_HOME is not set. Using ~/.config"
     XDG_CONFIG_HOME="$HOME/.config"
 fi
 
-if [ -z "$DEV_ENV" ]; then
+if [ -z "${DEV_ENV:-}" ]; then
     echo "DEV_ENV is not set. Please set DEV_ENV to continue..."
     exit 1
 fi
