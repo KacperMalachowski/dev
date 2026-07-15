@@ -1,0 +1,3 @@
+# Follow `# shellcheck source=` directives into sourced files (equivalent to
+# `shellcheck -x`), so sourcing runs/claude-mcp.d/*.sh doesn't emit SC1091.
+external-sources=true
