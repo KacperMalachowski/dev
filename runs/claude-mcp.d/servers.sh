@@ -12,6 +12,7 @@ else
 fi
 
 register_stdio_mcp "context7" npx -y @upstash/context7-mcp
+register_stdio_mcp "drawio" npx -y @drawio/mcp@1.4.0
 
 register_remote_mcp "sse" "cloudflare" "https://mcp.cloudflare.com/mcp"
 register_stdio_mcp "sequential-thinking" npx -y @modelcontextprotocol/server-sequential-thinking
