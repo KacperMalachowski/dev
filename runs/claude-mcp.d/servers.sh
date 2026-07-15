@@ -16,4 +16,5 @@ register_stdio_mcp "drawio" npx -y @drawio/mcp@1.4.0
 
 register_remote_mcp "sse" "cloudflare" "https://mcp.cloudflare.com/mcp"
 register_remote_mcp "sse" "opentofu" "https://mcp.opentofu.org/sse"
+register_remote_mcp "http" "google-dev-knowledge" "https://developerknowledge.googleapis.com/mcp"
 register_stdio_mcp "sequential-thinking" npx -y @modelcontextprotocol/server-sequential-thinking
