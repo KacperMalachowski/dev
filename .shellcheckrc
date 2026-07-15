@@ -1,3 +1,6 @@
 # Follow `# shellcheck source=` directives into sourced files (equivalent to
 # `shellcheck -x`), so sourcing runs/claude-mcp.d/*.sh doesn't emit SC1091.
 external-sources=true
+# Resolve `source=` paths relative to each script's own directory, not the CWD
+# shellcheck runs from — runs/claude-mcp references claude-mcp.d/ next to it.
+source-path=SCRIPTDIR
