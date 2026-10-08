@@ -20,11 +20,16 @@ register_remote_mcp "http" "cloudflare" "https://mcp.cloudflare.com/mcp"
 register_remote_mcp "http" "opentofu" "https://mcp.opentofu.org/mcp"
 register_stdio_mcp "sequential-thinking" npx -y @modelcontextprotocol/server-sequential-thinking
 
-# Google Developer Knowledge — requires GCP credentials (gcloud auth login)
-GCP_TOKEN="${GCP_TOKEN:-$(gcloud auth print-access-token 2>/dev/null)}"
+# Google Developer Knowledge — requires GCP credentials (gcloud auth login).
+# Google's auth server does not support Dynamic Client Registration (RFC 7591),
+# so Claude Code's built-in OAuth flow fails. A gcloud access token is used
+# instead. Tokens expire in ~1h, so we unregister first and re-register with
+# a freshly minted token on every run.
+GCP_TOKEN="${GCP_TOKEN:-$(gcloud auth print-access-token 2>/dev/null || true)}"
 if [[ -z "$GCP_TOKEN" ]]; then
     echo "No GCP token found (run 'gcloud auth login') — skipping google-dev-knowledge."
 else
+    unregister_mcp "google-dev-knowledge"
     register_remote_mcp "http" "google-dev-knowledge" \
         "https://developerknowledge.googleapis.com/mcp" \
         "Authorization: Bearer ${GCP_TOKEN}"
