@@ -20,3 +20,12 @@ source "$LIB_DIR/_lib.sh"
 
 # shellcheck source=claude-mcp.d/servers.sh
 source "$LIB_DIR/servers.sh"
+
+# Source any overlay drop-ins (e.g. servers-work.sh from a private overlay).
+# Files must be named servers-*.sh and be executable; they share _lib.sh helpers.
+for _overlay in "$LIB_DIR"/servers-*.sh; do
+    [[ -f "$_overlay" ]] || continue
+    # shellcheck disable=SC1090
+    source "$_overlay"
+done
+unset _overlay

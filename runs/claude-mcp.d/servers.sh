@@ -19,3 +19,13 @@ register_stdio_mcp "drawio" npx -y @drawio/mcp@1.4.0
 register_remote_mcp "http" "cloudflare" "https://mcp.cloudflare.com/mcp"
 register_remote_mcp "http" "opentofu" "https://mcp.opentofu.org/mcp"
 register_stdio_mcp "sequential-thinking" npx -y @modelcontextprotocol/server-sequential-thinking
+
+# Google Developer Knowledge — requires GCP credentials (gcloud auth login)
+GCP_TOKEN="${GCP_TOKEN:-$(gcloud auth print-access-token 2>/dev/null)}"
+if [[ -z "$GCP_TOKEN" ]]; then
+    echo "No GCP token found (run 'gcloud auth login') — skipping google-dev-knowledge."
+else
+    register_remote_mcp "http" "google-dev-knowledge" \
+        "https://developerknowledge.googleapis.com/mcp" \
+        "Authorization: Bearer ${GCP_TOKEN}"
+fi
