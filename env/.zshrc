@@ -2,6 +2,12 @@
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
+# The native OpenCode installer uses this directory. Keep it available to
+# interactive shells, including tmux launches, without duplicate PATH entries.
+typeset -U path
+path=("$HOME/.opencode/bin" "${path[@]}")
+export PATH
+
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
@@ -109,4 +115,3 @@ export CLOUDFLARE_API_TOKEN=$(cat ~/.secrets/cloudflare-api-token 2>/dev/null)
 export CLOUDFLARE_ACCOUNT_ID=$(cat ~/.secrets/cloudflare-account-id 2>/dev/null)
 
 source ~/.zsh_profile
-
