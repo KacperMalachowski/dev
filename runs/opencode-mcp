@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+
+# OpenCode counterpart of claude-mcp; machine credentials are never committed.
+set -euo pipefail
+umask 077
+
+if [[ "${AI_CLIENT:-opencode}" == "claude" ]]; then
+    echo "OpenCode MCP: skipped (Claude-only setup requested)."
+    exit 0
+fi
+
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/opencode"
+CONFIG="$CONFIG_DIR/opencode.json"
+if [[ -f "$CONFIG_DIR/opencode.jsonc" ]]; then
+    echo "OpenCode MCP: JSONC config needs manual registration via /mcps." >&2
+    exit 1
+fi
+
+command -v jq > /dev/null || { echo "OpenCode MCP requires jq." >&2; exit 1; }
+mkdir -p "$CONFIG_DIR"
+if [[ ! -f "$CONFIG" ]]; then
+    # shellcheck disable=SC2016 # Literal JSON schema key, not a shell variable.
+    echo '{"$schema":"https://opencode.ai/config.json"}' > "$CONFIG"
+fi
+backup="$(mktemp "$CONFIG_DIR/opencode.json.backup.XXXXXX")"
+cp "$CONFIG" "$backup"
+chmod 600 "$backup"
+
+register() {
+    local name="$1" entry="$2" temporary
+    temporary="$(mktemp "$CONFIG_DIR/opencode.json.XXXXXX")"
+    jq --arg name "$name" --argjson entry "$entry" \
+        '.mcp.servers[$name] = $entry' "$CONFIG" > "$temporary"
+    mv "$temporary" "$CONFIG"
+    echo "$name: registered."
+}
+
+register context7 '{"type":"local","command":["npx","-y","@upstash/context7-mcp"]}'
+register drawio '{"type":"local","command":["npx","-y","@drawio/mcp@1.4.0"]}'
+register cloudflare '{"type":"remote","url":"https://mcp.cloudflare.com/mcp"}'
+register opentofu '{"type":"remote","url":"https://mcp.opentofu.org/mcp"}'
+register sequential-thinking '{"type":"local","command":["npx","-y","@modelcontextprotocol/server-sequential-thinking"]}'
+
+GITHUB_TOKEN="${GITHUB_TOKEN:-}"
+if [[ -z "$GITHUB_TOKEN" ]] && command -v gh > /dev/null; then
+    GITHUB_TOKEN="$(gh auth token --hostname github.com 2>/dev/null || true)"
+fi
+if [[ -n "$GITHUB_TOKEN" ]]; then
+    register githubcom "$(jq -n --arg token "$GITHUB_TOKEN" \
+        '{type:"remote",url:"https://api.githubcopilot.com/mcp/",oauth:false,headers:{Authorization:("Bearer " + $token)}}')"
+else
+    echo "githubcom: no personal GitHub token; skipped."
+fi
+
+GCP_TOKEN="${GCP_TOKEN:-}"
+if [[ -z "$GCP_TOKEN" ]] && command -v gcloud > /dev/null; then
+    GCP_TOKEN="$(gcloud auth print-access-token 2>/dev/null || true)"
+fi
+if [[ -n "$GCP_TOKEN" ]]; then
+    register google-dev-knowledge "$(jq -n --arg token "$GCP_TOKEN" \
+        '{type:"remote",url:"https://developerknowledge.googleapis.com/mcp",oauth:false,headers:{Authorization:("Bearer " + $token)}}')"
+else
+    echo "google-dev-knowledge: no cloud token; skipped."
+fi
+
+echo "Check connections with opencode mcp list; sign into OAuth servers through /mcps."

@@ -79,6 +79,8 @@ copy "$DEV_ENV/env/.zshrc" "$HOME/.zshrc"
 copy "$DEV_ENV/env/.tmux-sessionizer" "$HOME/.tmux-sessionizer"
 copy "$DEV_ENV/dev-env" "$HOME/.local/scripts/dev-env"
 
-# Build Claude Code config from .ai repo (base + overlay)
-log "Building Claude Code config..."
-"$DEV_ENV/env/.config/.ai/build"
+# Build the selected AI client; OpenCode is the default.
+log "Building AI config (${AI_CLIENT:-opencode})..."
+if [[ "$dry_run" == "0" ]]; then
+    bash "$DEV_ENV/env/.config/.ai/build"
+fi

@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if [[ "${AI_CLIENT:-opencode}" == "claude" ]]; then
+    echo "OpenCode: skipped (Claude-only setup requested)."
+    exit 0
+fi
+
+if command -v opencode &> /dev/null; then
+    echo "OpenCode: already installed."
+else
+    curl -fsSL https://opencode.ai/v2/install | bash
+fi
