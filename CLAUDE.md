@@ -30,6 +30,10 @@ and its own `build`. Source skills and agents are vendor-neutral; deployment
 adapters supply client-specific syntax. OpenCode is the default. Use `AI_CLIENT=claude` or `both`
 to install/deploy Claude compatibility. Nothing uninstalls an existing Claude CLI.
 
+Native OpenCode roles and reusable methods share scoped execution guidance in the
+AI submodule. Its `profiles/` directory owns cost defaults and specialist step
+limits. See `env/.config/.ai/CLAUDE.md` instead of duplicating workflow policy here.
+
 ## Scope
 
 Keep this repo **generic and public** — no employer-specific hosts, tokens,
