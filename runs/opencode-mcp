@@ -30,7 +30,7 @@ register() {
     local name="$1" entry="$2" temporary
     temporary="$(mktemp "$CONFIG_DIR/opencode.json.XXXXXX")"
     jq --arg name "$name" --argjson entry "$entry" \
-        '.mcp.servers[$name] = $entry' "$CONFIG" > "$temporary"
+        '.mcp[$name] = $entry' "$CONFIG" > "$temporary"
     mv "$temporary" "$CONFIG"
     echo "$name: registered."
 }
