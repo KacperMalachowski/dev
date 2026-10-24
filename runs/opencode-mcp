@@ -10,6 +10,7 @@ if [[ "${AI_CLIENT:-opencode}" == "claude" ]]; then
 fi
 
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/opencode"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG="$CONFIG_DIR/opencode.json"
 if [[ -f "$CONFIG_DIR/opencode.jsonc" ]]; then
     echo "OpenCode MCP: JSONC config needs manual registration via /mcps." >&2
@@ -61,6 +62,25 @@ if [[ -n "$GCP_TOKEN" ]]; then
         '{type:"remote",url:"https://developerknowledge.googleapis.com/mcp",oauth:false,headers:{Authorization:("Bearer " + $token)}}')"
 else
     echo "google-dev-knowledge: no cloud token; skipped."
+fi
+
+# Opt-in: a read-only Claude review tool backed by the personal `claude -p`
+# sign-in. Registered only on request, because every call spends subscription
+# quota and sends the selected prompt/context to Anthropic.
+if [[ "${CLAUDE_BRIDGE:-0}" == "1" ]]; then
+    AI_DIR="$(dirname "$SCRIPT_DIR")/env/.config/.ai"
+    if [[ ! -f "$AI_DIR/claude-bridge-mcp.py" ]]; then
+        echo "claude-bridge: .ai checkout lacks claude-bridge-mcp.py; skipped." >&2
+    elif ! command -v uv > /dev/null; then
+        echo "claude-bridge: requires uv (runs/uv); skipped." >&2
+    else
+        register claude-bridge "$(jq -n --arg script "$AI_DIR/claude-bridge-mcp.py" \
+            '{type:"local",
+              command:["uv","run","--no-project","--quiet","--with","mcp==2.3.0","python",$script],
+              timeout:960000}')"
+    fi
+else
+    echo "claude-bridge: not registered (set CLAUDE_BRIDGE=1 to opt in)."
 fi
 
 echo "Check connections with opencode mcp list; sign into OAuth servers through /mcps."

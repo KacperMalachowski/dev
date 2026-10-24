@@ -19,7 +19,7 @@ that overlays employer-specific config on top).
 
 ## Responsibilities (important distinction)
 
-- **`runs/`** — tool installation plus the existing MCP-registration exception (`opencode-mcp` / optional `claude-mcp`). No dotfile copying.
+- **`runs/`** — tool installation plus the existing MCP-registration exception (`opencode-mcp` / optional `claude-mcp`). `opencode-mcp` registers the personal Claude bridge (`env/.config/.ai/claude-bridge-mcp.py`) only when `CLAUDE_BRIDGE=1`. No dotfile copying.
 - **`dev-env`** — the *setup* script that copies config files into `$XDG_CONFIG_HOME`/`$HOME`, then builds the selected AI config from the `.ai` submodule. Dry runs do not build.
 
 ## AI config
