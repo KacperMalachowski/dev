@@ -11,6 +11,6 @@ if [[ "$(pwd)" == $HOME/work ]]; then
 fi
 
 tmux new-window -dn scratch
-tmux new-window -dn opencode 'zsh -ic "exec opencode"'
+tmux new-window -dn claude 'zsh -ic "exec claude"'
 vim .
 clear

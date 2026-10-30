@@ -1,7 +1,7 @@
 # dev — personal dev-environment bootstrapper (public base)
 
 Kacper's **public, personal** dev-environment: shell config, tooling installs,
-and OpenCode-first AI setup. This repo is shared across all of Kacper's machines and
+and Claude Code AI setup. This repo is shared across all of Kacper's machines and
 is consumed as a submodule by machine-specific supersets (e.g. a work repo
 that overlays employer-specific config on top).
 
@@ -10,29 +10,25 @@ that overlays employer-specific config on top).
 ```
 .
 ├── env/                  # dotfiles: zsh, tmux, nvim, git, and .config/.ai (skills/agents)
-│   └── .config/.ai/      # submodule: github.com/KacperMalachowski/.ai — portable skills/agents
+│   └── .config/.ai/      # submodule: github.com/KacperMalachowski/.ai — Claude Code skills/agents
 ├── runs/                 # tool INSTALL steps only (claude-code, docker, gcloud, nvim, …)
 ├── run                   # dispatcher: executes each executable in runs/
-├── dev-env               # copies dotfiles into place, then invokes env/.config/.ai/build
+├── dev-env               # copies dotfiles into place, then invokes env/.config/.ai/build;
+│                         # --check reports drift, --only <dir> deploys one config
 ├── setup / init          # entrypoints
 ```
 
 ## Responsibilities (important distinction)
 
-- **`runs/`** — tool installation plus the existing MCP-registration exception (`opencode-mcp` / optional `claude-mcp`). No dotfile copying.
-- **`dev-env`** — the *setup* script that copies config files into `$XDG_CONFIG_HOME`/`$HOME`, then builds the selected AI config from the `.ai` submodule. Dry runs do not build.
+- **`runs/`** — tool installation plus the MCP-registration exception (`claude-mcp`). No dotfile copying.
+- **`dev-env`** — the *setup* script that copies config files into `$XDG_CONFIG_HOME`/`$HOME`, then builds the Claude Code config from the `.ai` submodule. Dry runs do not build. `--check` changes nothing and exits non-zero on drift; `--only <dir>` deploys a single `env/.config` directory (`.ai` runs only the build).
 
 ## AI config
 
-Skills, agents, and the global `AGENTS.md` come from the `env/.config/.ai`
+Skills, agents, settings, and the global persona come from the `env/.config/.ai`
 submodule (`KacperMalachowski/.ai`), which has a `base/` + `overlays/` structure
-and its own `build`. Source skills and agents are vendor-neutral; deployment
-adapters supply client-specific syntax. OpenCode is the default. Use `AI_CLIENT=claude` or `both`
-to install/deploy Claude compatibility. Nothing uninstalls an existing Claude CLI.
-
-Native OpenCode roles and reusable methods share scoped execution guidance in the
-AI submodule. Its `profiles/` directory owns cost defaults and specialist step
-limits. See `env/.config/.ai/CLAUDE.md` instead of duplicating workflow policy here.
+and its own `build` that deploys into `~/.claude`. Claude Code is the only client.
+See `env/.config/.ai/CLAUDE.md` instead of duplicating workflow policy here.
 
 ## Scope
 
