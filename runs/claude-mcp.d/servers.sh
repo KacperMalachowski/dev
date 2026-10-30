@@ -18,7 +18,8 @@ register_stdio_mcp "drawio" npx -y @drawio/mcp@1.4.0
 # streamable HTTP at /mcp.
 register_remote_mcp "http" "cloudflare" "https://mcp.cloudflare.com/mcp"
 register_remote_mcp "http" "opentofu" "https://mcp.opentofu.org/mcp"
-register_stdio_mcp "sequential-thinking" npx -y @modelcontextprotocol/server-sequential-thinking
+# Retired: the models think natively, so this server only added tool overhead.
+unregister_mcp "sequential-thinking"
 
 # Google Developer Knowledge — requires GCP credentials (gcloud auth login).
 # Google's auth server does not support Dynamic Client Registration (RFC 7591),
