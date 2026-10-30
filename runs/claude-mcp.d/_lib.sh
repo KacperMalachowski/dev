@@ -21,7 +21,7 @@ register_remote_mcp() {
     local transport="$1"
     local name="$2"
     local url="$3"
-    local header="$4"
+    local header="${4:-}"
 
     if claude mcp get "$name" &> /dev/null; then
         echo "$name: already registered, skipping."
@@ -60,7 +60,7 @@ register_stdio_mcp_with_env() {
         env_args+=(-e "$1")
         shift
     done
-    [[ "$1" == "--" ]] && shift
+    [[ "${1:-}" == "--" ]] && shift
 
     if claude mcp get "$name" &> /dev/null; then
         echo "$name: already registered, skipping."
