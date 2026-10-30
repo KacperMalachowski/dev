@@ -20,7 +20,7 @@ that overlays employer-specific config on top).
 
 ## Responsibilities (important distinction)
 
-- **`runs/`** — tool installation plus the MCP-registration exception (`claude-mcp`). No dotfile copying.
+- **`runs/`** — tool installation plus two registration exceptions: MCP servers (`claude-mcp`) and the SSH commit-signing key with its git config (`git-signing`). No dotfile copying.
 - **`dev-env`** — the *setup* script that copies config files into `$XDG_CONFIG_HOME`/`$HOME`, then builds the Claude Code config from the `.ai` submodule. Dry runs do not build. `--check` changes nothing and exits non-zero on drift; `--only <dir>` deploys a single `env/.config` directory (`.ai` runs only the build).
 
 ## AI config
