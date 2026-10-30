@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+# Sign commits and tags with a dedicated SSH key registered on GitHub.
+set -euo pipefail
+
+key="$HOME/.ssh/git_signing"
+signers="$HOME/.ssh/allowed_signers"
+
+email="$(git config --global user.email || true)"
+if [[ -z "$email" ]]; then
+    echo "Git signing: set git config --global user.email first." >&2
+    exit 1
+fi
+
+mkdir -p "$HOME/.ssh"
+chmod 700 "$HOME/.ssh"
+if [[ ! -f "$key" ]]; then
+    ssh-keygen -q -t ed25519 -N "" -C "git commit signing" -f "$key"
+    echo "Git signing: created $key."
+fi
+public_key="$(cut -d' ' -f1,2 "$key.pub")"
+
+# Lets git verify signatures locally (git log --show-signature).
+signer="$email namespaces=\"git\" $public_key"
+if ! grep -qxF "$signer" "$signers" 2> /dev/null; then
+    echo "$signer" >> "$signers"
+fi
+
+# Only configure signing once the key exists, so commits never fail on a
+# machine that hasn't run this step.
+git config --global gpg.format ssh
+git config --global user.signingkey "$key.pub"
+git config --global gpg.ssh.allowedSignersFile "$signers"
+git config --global commit.gpgsign true
+git config --global tag.gpgsign true
+echo "Git signing: commits and tags are signed."
+
+# .zshrc exports GITHUB_TOKEN from gh; use gh's stored login so a refreshed
+# scope applies without a new shell.
+if ! command -v gh &> /dev/null; then
+    echo "Git signing: gh not installed; upload $key.pub as a signing key manually."
+    exit 0
+fi
+if ! registered="$(env -u GITHUB_TOKEN gh api user/ssh_signing_keys --jq '.[].key' 2> /dev/null)"; then
+    echo "Git signing: cannot list GitHub signing keys. Grant the scope, then re-run:" >&2
+    echo "  GITHUB_TOKEN= gh auth refresh -h github.com -s admin:ssh_signing_key" >&2
+    exit 0
+fi
+if grep -qxF "$public_key" <<< "$registered"; then
+    echo "Git signing: key already registered on GitHub."
+else
+    env -u GITHUB_TOKEN gh ssh-key add "$key.pub" --type signing --title "git signing ($(hostname -s))"
+fi
