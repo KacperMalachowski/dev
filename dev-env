@@ -49,10 +49,8 @@ report() {
     drift="1"
 }
 
-# Extra arguments are passed to diff, e.g. -x for files copied in separately.
 check_dir() {
     local source="$1" target="$2" c
-    shift 2
     while read -r c; do
         c=${c#"$source"/}
         if [[ "$c" == ".ai" ]]; then
@@ -60,7 +58,7 @@ check_dir() {
         fi
         if [[ ! -d "$target/$c" ]]; then
             report "$target/$c is missing"
-        elif ! diff -rq -x .git "$@" "$source/$c" "$target/$c" > /dev/null; then
+        elif ! diff -rq -x .git "$source/$c" "$target/$c" > /dev/null; then
             report "$target/$c differs from $source/$c"
         fi
     done < <(find "$source" -mindepth 1 -maxdepth 1 -type d)
@@ -75,7 +73,6 @@ check_file() {
 check_drift() {
     local line skill name legacy
     check_dir "$DEV_ENV/env/.config" "$XDG_CONFIG_HOME"
-    check_dir "$DEV_ENV/env/.local" "$HOME/.local" -x tmux-sessionizer -x dev-env
     check_file "$DEV_ENV/tmux-sessionizer/tmux-sessionizer" "$HOME/.local/scripts/tmux-sessionizer"
     check_file "$DEV_ENV/env/.zsh_profile" "$HOME/.zsh_profile"
     check_file "$DEV_ENV/env/.zshrc" "$HOME/.zshrc"
@@ -166,8 +163,8 @@ fi
 
 if [[ -z "$only" ]]; then
     update_files "$DEV_ENV/env/.config" "$XDG_CONFIG_HOME"
-    update_files "$DEV_ENV/env/.local" "$HOME/.local"
 
+    mkdir -p "$HOME/.local/scripts"
     copy "$DEV_ENV/tmux-sessionizer/tmux-sessionizer" "$HOME/.local/scripts/tmux-sessionizer"
     copy "$DEV_ENV/env/.zsh_profile" "$HOME/.zsh_profile"
     copy "$DEV_ENV/env/.zshrc" "$HOME/.zshrc"
