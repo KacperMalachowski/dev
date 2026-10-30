@@ -2,11 +2,6 @@
 
 set -euo pipefail
 
-if [[ "${AI_CLIENT:-opencode}" == "opencode" ]]; then
-    echo "Claude MCP: skipped (OpenCode is the default client)."
-    exit 0
-fi
-
 if ! command -v claude &> /dev/null; then
     echo "Claude Code is not installed. Run runs/claude-code first."
     exit 1

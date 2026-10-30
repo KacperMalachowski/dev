@@ -3,6 +3,8 @@
 set -euo pipefail
 
 dry_run="0"
+check="0"
+only=""
 
 if [ -z "${XDG_CONFIG_HOME:-}" ]; then
     echo "XDG_CONFIG_HOME is not set. Using ~/.config"
@@ -14,9 +16,21 @@ if [ -z "${DEV_ENV:-}" ]; then
     exit 1
 fi
 
-if [[ "${1:-}" == "--dry" ]]; then
-    dry_run="1"
-fi
+usage() {
+    echo "Usage: dev-env [--dry] [--check] [--only <config-dir>]" >&2
+    exit 1
+}
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --dry) dry_run="1"; shift ;;
+        # Report drift between the repo and deployed files; change nothing.
+        --check) check="1"; shift ;;
+        # Deploy one env/.config directory; ".ai" runs only the AI build.
+        --only) [[ $# -ge 2 ]] || usage; only="$2"; shift 2 ;;
+        *) usage ;;
+    esac
+done
 
 log() {
     if [[ $dry_run == "1" ]]; then
@@ -28,6 +42,72 @@ log() {
 
 log "env: $DEV_ENV"
 
+drift="0"
+
+report() {
+    echo "DRIFT: $1"
+    drift="1"
+}
+
+# Extra arguments are passed to diff, e.g. -x for files copied in separately.
+check_dir() {
+    local source="$1" target="$2" c
+    shift 2
+    while read -r c; do
+        c=${c#"$source"/}
+        if [[ "$c" == ".ai" ]]; then
+            continue
+        fi
+        if [[ ! -d "$target/$c" ]]; then
+            report "$target/$c is missing"
+        elif ! diff -rq -x .git "$@" "$source/$c" "$target/$c" > /dev/null; then
+            report "$target/$c differs from $source/$c"
+        fi
+    done < <(find "$source" -mindepth 1 -maxdepth 1 -type d)
+}
+
+check_file() {
+    if ! cmp -s "$1" "$2"; then
+        report "$2 differs from $1"
+    fi
+}
+
+check_drift() {
+    local line skill name legacy
+    check_dir "$DEV_ENV/env/.config" "$XDG_CONFIG_HOME"
+    check_dir "$DEV_ENV/env/.local" "$HOME/.local" -x tmux-sessionizer -x dev-env
+    check_file "$DEV_ENV/tmux-sessionizer/tmux-sessionizer" "$HOME/.local/scripts/tmux-sessionizer"
+    check_file "$DEV_ENV/env/.zsh_profile" "$HOME/.zsh_profile"
+    check_file "$DEV_ENV/env/.zshrc" "$HOME/.zshrc"
+    check_file "$DEV_ENV/env/.tmux-sessionizer" "$HOME/.tmux-sessionizer"
+    check_file "$DEV_ENV/dev-env" "$HOME/.local/scripts/dev-env"
+
+    # A leading "+" or "-" means the checkout differs from the recorded commit.
+    while read -r line; do
+        if [[ "$line" == [+-]* ]]; then
+            report "submodule not at recorded commit: $line"
+        fi
+    done < <(git -C "$DEV_ENV" submodule status)
+
+    # Legacy commands with a skill's name shadow the deployed skill.
+    for skill in "$DEV_ENV"/env/.config/.ai/base/skills/*/; do
+        name=$(basename "$skill")
+        for legacy in "$HOME/.claude/commands/$name" "$HOME/.claude/commands/$name.md"; do
+            if [[ -e "$legacy" ]]; then
+                report "legacy $legacy shadows the $name skill"
+            fi
+        done
+    done
+}
+
+if [[ "$check" == "1" ]]; then
+    check_drift
+    if [[ "$drift" == "0" ]]; then
+        echo "No drift."
+    fi
+    exit "$drift"
+fi
+
 update_files() {
     log "Updating config files for $DEV_ENV environment..."
     log "Source: $1"
@@ -38,6 +118,11 @@ update_files() {
         for c in $configs; do
             # Skip .ai - handled separately by build script
             if [[ "$c" == "./.ai" ]]; then
+                continue
+            fi
+
+            # --only limits the deploy to one directory.
+            if [[ -n "$only" && "$c" != "./$only" ]]; then
                 continue
             fi
 
@@ -70,17 +155,27 @@ copy() {
     fi
 }
 
-update_files "$DEV_ENV/env/.config" "$XDG_CONFIG_HOME"
-update_files "$DEV_ENV/env/.local" "$HOME/.local"
+if [[ -n "$only" && "$only" != ".ai" ]]; then
+    if [[ ! -d "$DEV_ENV/env/.config/$only" ]]; then
+        echo "No env/.config/$only to deploy." >&2
+        exit 1
+    fi
+    update_files "$DEV_ENV/env/.config" "$XDG_CONFIG_HOME"
+    exit 0
+fi
 
-copy "$DEV_ENV/tmux-sessionizer/tmux-sessionizer" "$HOME/.local/scripts/tmux-sessionizer"
-copy "$DEV_ENV/env/.zsh_profile" "$HOME/.zsh_profile"
-copy "$DEV_ENV/env/.zshrc" "$HOME/.zshrc"
-copy "$DEV_ENV/env/.tmux-sessionizer" "$HOME/.tmux-sessionizer"
-copy "$DEV_ENV/dev-env" "$HOME/.local/scripts/dev-env"
+if [[ -z "$only" ]]; then
+    update_files "$DEV_ENV/env/.config" "$XDG_CONFIG_HOME"
+    update_files "$DEV_ENV/env/.local" "$HOME/.local"
 
-# Build the selected AI client; OpenCode is the default.
-log "Building AI config (${AI_CLIENT:-opencode})..."
+    copy "$DEV_ENV/tmux-sessionizer/tmux-sessionizer" "$HOME/.local/scripts/tmux-sessionizer"
+    copy "$DEV_ENV/env/.zsh_profile" "$HOME/.zsh_profile"
+    copy "$DEV_ENV/env/.zshrc" "$HOME/.zshrc"
+    copy "$DEV_ENV/env/.tmux-sessionizer" "$HOME/.tmux-sessionizer"
+    copy "$DEV_ENV/dev-env" "$HOME/.local/scripts/dev-env"
+fi
+
+log "Building Claude Code config..."
 if [[ "$dry_run" == "0" ]]; then
     bash "$DEV_ENV/env/.config/.ai/build"
 fi
