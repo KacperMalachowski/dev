@@ -2,7 +2,7 @@
 # MCP servers registered by runs/claude-mcp.
 
 # GitHub Copilot MCP (public github.com) — token from GITHUB_TOKEN env or gh CLI
-GITHUB_TOKEN="${GITHUB_TOKEN:-$(gh auth token 2>/dev/null)}"
+GITHUB_TOKEN="${GITHUB_TOKEN:-$(gh auth token 2>/dev/null || true)}"
 if [[ -z "$GITHUB_TOKEN" ]]; then
     echo "No GitHub token found (set GITHUB_TOKEN or run 'gh auth login') — skipping githubcom."
 else
