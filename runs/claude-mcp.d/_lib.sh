@@ -21,7 +21,9 @@ register_remote_mcp() {
     local transport="$1"
     local name="$2"
     local url="$3"
-    local header="$4"
+    # Optional: default to empty so a headerless call (3 args) does not trip
+    # `set -u`. The guard below selects the --header form only when non-empty.
+    local header="${4:-}"
 
     if claude mcp get "$name" &> /dev/null; then
         echo "$name: already registered, skipping."
